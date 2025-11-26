@@ -4,14 +4,27 @@ import 'package:flutter_chatter_hub/dialogs/confirm_number_dialog.dart';
 import 'package:flutter_chatter_hub/screens/otp_screen_view.dart';
 
 
-class NumberInputScreenView extends StatelessWidget {
+class NumberInputScreenView extends StatefulWidget {
   const NumberInputScreenView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
-    final controller = TextEditingController();
+  State<NumberInputScreenView> createState() => _NumberInputScreenViewState();
+}
 
+class _NumberInputScreenViewState extends State<NumberInputScreenView> {
+  final formKey = GlobalKey<FormState>();
+  final controller = TextEditingController();
+  String countryCode = '+1'; // Default to US country code
+
+  String _formatPhoneNumber(String phoneNumber) {
+    // Remove any non-digit characters
+    String digitsOnly = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
+    // Format to E.164: +[country code][number]
+    return '$countryCode$digitsOnly';
+  }
+  
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 244, 181, 225),
@@ -38,32 +51,66 @@ class NumberInputScreenView extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // Phone number input
-              TextFormField(
-                controller: controller,
-                keyboardType: TextInputType.phone,
-                cursorColor: Colors.pink,
-                maxLength: 11,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter your phone number";
-                  }
-                  if (!RegExp(r'^[0-9]{11}$').hasMatch(value)) {
-                    return "Enter a valid 11-digit number";
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  hintText: "Phone number",
-                  prefixIcon: Icon(Icons.phone, color: Colors.pink),
-                  counterText: "",
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.pink, width: 2),
+              // Country code selector
+              Row(
+                children: [
+                  SizedBox(
+                    width: 100,
+                    child: TextFormField(
+                      initialValue: countryCode,
+                      keyboardType: TextInputType.phone,
+                      cursorColor: Colors.pink,
+                      onChanged: (value) {
+                        setState(() {
+                          countryCode = value.startsWith('+') ? value : '+$value';
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "+1",
+                        prefixText: "",
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.pink, width: 2),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.pink, width: 2),
+                        ),
+                      ),
+                    ),
                   ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.pink, width: 2),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: controller,
+                      keyboardType: TextInputType.phone,
+                      cursorColor: Colors.pink,
+                      maxLength: 15,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter your phone number";
+                        }
+                        // Validate that it contains only digits
+                        if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                          return "Enter a valid phone number";
+                        }
+                        if (value.length < 7) {
+                          return "Phone number too short";
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "Phone number",
+                        prefixIcon: Icon(Icons.phone, color: Colors.pink),
+                        counterText: "",
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.pink, width: 2),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.pink, width: 2),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
 
               const SizedBox(height: 40),
@@ -75,18 +122,18 @@ class NumberInputScreenView extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
+                      final formattedNumber = _formatPhoneNumber(controller.text);
                       showDialog(
                         context: context,
                         builder: (_) => ConfirmNumberDialogView(
-                          enteredNumber: controller.text,
+                          enteredNumber: formattedNumber,
                           onEdit: () => Navigator.pop(context),
                           onOk: () {
                             Navigator.pop(context); 
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>OtpScreenView(phoneNumber: controller.text), 
-                                
+                                builder: (_) => OtpScreenView(phoneNumber: formattedNumber), 
                               ),
                             );
                           },

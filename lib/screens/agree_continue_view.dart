@@ -21,6 +21,8 @@ class AgreeContinueView extends StatelessWidget {
               Image.asset(
                 'assets/images/logo.jpeg',
                 height: 100,
+                cacheWidth: 200, // Optimize image loading
+                filterQuality: FilterQuality.medium,
               ),
               const SizedBox(height: 40),
               const Text(

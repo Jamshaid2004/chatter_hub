@@ -7,11 +7,13 @@ class SendOtpEvent extends OtpEvents{
 
 class VerifyOtpEvent extends OtpEvents{
   final String otpCode;
-  VerifyOtpEvent(this.otpCode);
+  final String verificationId;
+  VerifyOtpEvent(this.otpCode, this.verificationId);
 }
 
 class ResendOtpEvent extends OtpEvents {
   final String phoneNumber;
-  ResendOtpEvent(this.phoneNumber);
+  final int? resendToken;
+  ResendOtpEvent(this.phoneNumber, {this.resendToken});
 }
 

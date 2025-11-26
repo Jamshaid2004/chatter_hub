@@ -10,16 +10,82 @@ import 'package:flutter_chatter_hub/screens/profile_info_screen.dart';
 
 
 
-class OtpScreenView extends StatelessWidget {
+class OtpScreenView extends StatefulWidget {
   final String phoneNumber;
-  final TextEditingController _otpController = TextEditingController();
 
-  OtpScreenView({super.key, required this.phoneNumber});
+  const OtpScreenView({super.key, required this.phoneNumber});
+
+  @override
+  State<OtpScreenView> createState() => _OtpScreenViewState();
+}
+
+class _OtpScreenViewState extends State<OtpScreenView> {
+  final TextEditingController _otpController = TextEditingController();
+  String? _verificationId;
+  int? _resendToken;
+
+  void _showContactsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => ContactsPermissionDialog(
+        onAllow: () {
+          Navigator.pop(context);
+          _showCameraDialog(context);
+        },
+        onDontAllow: () {
+          Navigator.pop(context);
+          _showCameraDialog(context);
+        },
+      ),
+    );
+  }
+
+  void _showCameraDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => CameraPermissionDialog(
+        onAllow: () {
+          Navigator.pop(context);
+          _showAudioDialog(context);
+        },
+        onDontAllow: () {
+          Navigator.pop(context);
+          _showAudioDialog(context);
+        },
+      ),
+    );
+  }
+
+  void _showAudioDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AudioPermissionDialog(
+        onAllow: () {
+          Navigator.pop(context);
+          _goToProfileScreen(context);
+        },
+        onDontAllow: () {
+          Navigator.pop(context);
+          _goToProfileScreen(context);
+        },
+      ),
+    );
+  }
+
+  void _goToProfileScreen(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ProfileInfoScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => OtpBloc()..add(SendOtpEvent(phoneNumber)),
+      create: (_) => OtpBloc()..add(SendOtpEvent(widget.phoneNumber)),
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Verify your number"),
@@ -29,15 +95,19 @@ class OtpScreenView extends StatelessWidget {
           padding: const EdgeInsets.all(24.0),
           child: BlocConsumer<OtpBloc, OtpStates>(
             listener: (context, state) {
-              if (state is OtpVerifiedState) {
+              if (state is OtpSentState) {
+                _verificationId = state.verificationId;
+                _resendToken = state.resendToken;
+              } else if (state is OtpVerifiedState) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("OTP Verified! 🎉")),
                 );
-                Future.delayed(Duration.zero, (){
-                  _showContactsDialog(context);
+                // Use post-frame callback instead of Future.delayed for better performance
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    _showContactsDialog(context);
+                  }
                 });
-
-
               } else if (state is OtpErrorState) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(state.message)),
@@ -53,7 +123,7 @@ class OtpScreenView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-                  Text("We sent an SMS to $phoneNumber"),
+                  Text("We sent an SMS to ${widget.phoneNumber}"),
                   const SizedBox(height: 40),
 
                   TextField(
@@ -80,11 +150,13 @@ class OtpScreenView extends StatelessWidget {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
-                        context
-                            .read<OtpBloc>()
-                            .add(VerifyOtpEvent(_otpController.text));
-                      },
+                      onPressed: _verificationId != null ? () {
+                        if (_verificationId != null) {
+                          context
+                              .read<OtpBloc>()
+                              .add(VerifyOtpEvent(_otpController.text, _verificationId!));
+                        }
+                      } : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 224, 21, 170),
                         shape: RoundedRectangleBorder(
@@ -103,9 +175,11 @@ class OtpScreenView extends StatelessWidget {
 
                   TextButton(
                     onPressed: () {
-                      context.read<OtpBloc>().add(ResendOtpEvent(phoneNumber));
+                      context.read<OtpBloc>().add(
+                        ResendOtpEvent(widget.phoneNumber, resendToken: _resendToken),
+                      );
                     },
-                    child: const Text("Didn’t receive code? Resend",
+                    child: const Text("Didn't receive code? Resend",
                         style: TextStyle(color: Colors.pink, fontSize: 16)),
                   ),
                 ],
@@ -116,62 +190,5 @@ class OtpScreenView extends StatelessWidget {
       ),
     );
   }
-}
-void _showContactsDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => ContactsPermissionDialog(
-      onAllow: () {
-        Navigator.pop(context);
-        _showCameraDialog(context); // go to next
-      },
-      onDontAllow: () {
-        Navigator.pop(context);
-        _showCameraDialog(context); // still go to next
-      },
-    ),
-  );
-}
-
-void _showCameraDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => CameraPermissionDialog(
-      onAllow: () {
-        Navigator.pop(context);
-        _showAudioDialog(context); // go to next
-      },
-      onDontAllow: () {
-        Navigator.pop(context);
-        _showAudioDialog(context);
-      },
-    ),
-  );
-}
-
-void _showAudioDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => AudioPermissionDialog(
-      onAllow: () {
-        Navigator.pop(context);
-        _goToProfileScreen(context); // after last dialog
-      },
-      onDontAllow: () {
-        Navigator.pop(context);
-        _goToProfileScreen(context);
-      },
-    ),
-  );
-}
-
-void _goToProfileScreen(BuildContext context) {
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => ProfileInfoScreen()),
-  );
 }
 

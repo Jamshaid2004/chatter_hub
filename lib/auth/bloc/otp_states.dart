@@ -4,7 +4,11 @@ class OtpInitialState extends OtpStates {}
 
 class OtpLoadingState extends OtpStates {}
 
-class OtpSentState extends OtpStates {}
+class OtpSentState extends OtpStates {
+  final String verificationId;
+  final int? resendToken;
+  OtpSentState({required this.verificationId, this.resendToken});
+}
 
 class OtpVerifiedState extends OtpStates {}
 
