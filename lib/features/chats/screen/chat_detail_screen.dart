@@ -17,7 +17,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
   List<MessageModel> messages = [
     MessageModel(text: "Hi there!", isSentByMe: false),
-    MessageModel(text: "Hello 👋", isSentByMe: true),
+    MessageModel(text: "Hello", isSentByMe: true),
   ];
 
   void sendMessage() {
@@ -38,7 +38,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.pink,
+        backgroundColor: const Color.fromARGB(255, 243, 126, 165),
         title: Row(
           children: [
             CircleAvatar(
@@ -51,7 +51,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       ),
       body: Column(
         children: [
-          // CHAT MESSAGES LIST
+          
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(12),
@@ -65,21 +65,21 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             ),
           ),
 
-          // INPUT BAR
+          
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            color: Colors.white,
+            color: const Color.fromARGB(255, 249, 210, 244),
             child: Row(
               children: [
-                // EMOJI BUTTON
+                
                 IconButton(
                   icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
                   onPressed: () {
-                    // TODO: Open emoji picker
+                    // Emoji implementation
                   },
                 ),
 
-                // TEXT FIELD WITH ATTACHMENT
+                
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -97,14 +97,14 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                               border: InputBorder.none,
                             ),
                             onChanged: (_) {
-                              setState(() {}); // Update send/mic icon
+                              setState(() {}); 
                             },
                           ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.attach_file, color: Colors.grey),
                           onPressed: () {
-                            //  Open attachment option
+                            //   attachment option
                           },
                         ),
                       ],
@@ -114,7 +114,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
                 const SizedBox(width: 6),
 
-                // SEND OR MIC BUTTON
+                
                 GestureDetector(
                   onTap: () {
                     if (_controller.text.trim().isNotEmpty) {
