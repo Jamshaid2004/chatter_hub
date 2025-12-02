@@ -10,12 +10,25 @@ class SentMessageBubble extends StatelessWidget {
       alignment: Alignment.centerRight,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-        margin: const EdgeInsets.symmetric(vertical: 5),
+        margin: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 249, 198, 238),
+          color: const Color(0xFFF8B8E3),
           borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 3,
+              offset: Offset(1, 2),
+            )
+          ],
         ),
-        child: Text(text, style: const TextStyle(color: Colors.black)),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.black87,
+            fontSize: 15,
+          ),
+        ),
       ),
     );
   }

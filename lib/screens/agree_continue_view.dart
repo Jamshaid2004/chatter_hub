@@ -21,7 +21,7 @@ class AgreeContinueView extends StatelessWidget {
               Image.asset(
                 'assets/images/logo.jpeg',
                 height: 100,
-                cacheWidth: 200, // Optimize image loading
+                cacheWidth: 200, 
                 filterQuality: FilterQuality.medium,
               ),
               const SizedBox(height: 40),
@@ -50,7 +50,7 @@ class AgreeContinueView extends StatelessWidget {
                       builder: (context) {
                         return NotificationDialogView(
                           onAllow: () {
-                            Navigator.pop(context); // close dialog
+                            Navigator.pop(context); 
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -60,14 +60,14 @@ class AgreeContinueView extends StatelessWidget {
                             );
                           },
                           onDontAllow: () {
-                            Navigator.pop(context); // just close dialog
+                            Navigator.pop(context); 
                           },
                         );
                       },
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 224, 21, 170),
+                    backgroundColor:const Color(0xFFF48BB8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
@@ -77,7 +77,7 @@ class AgreeContinueView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                 ),

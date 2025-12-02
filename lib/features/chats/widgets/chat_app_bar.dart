@@ -14,7 +14,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: const Color.fromARGB(255, 244, 181, 225),
+      backgroundColor:  const Color(0xFFF48BB8),
       title: ValueListenableBuilder<bool>(
         valueListenable: controller.isSearching,
         builder: (context, searching, _) {
@@ -31,21 +31,21 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       controller: controller.searchController,
       autofocus: true,
       style: const TextStyle(
-        color: Colors.pink,
+        color: Color.fromARGB(226, 162, 55, 91),
         fontWeight: FontWeight.bold,
         fontSize: 20,
       ),
-      cursorColor: Colors.pink,
+      cursorColor:Color.fromARGB(226, 162, 55, 91),
       decoration: InputDecoration(
         hintText: "Search ${controller.tabController.index == 0 ? 'chats' : 'groups'}...",
         hintStyle: const TextStyle(
-          color: Colors.pink,
+          color:Color.fromARGB(226, 162, 55, 91),
           fontWeight: FontWeight.bold,
           fontSize: 20,
         ),
         border: InputBorder.none,
         suffixIcon: IconButton(
-          icon: const Icon(Icons.clear, color: Colors.pink, size: 20),
+          icon: const Icon(Icons.clear, color:Color.fromARGB(226, 162, 55, 91), size: 20),
           onPressed: () {
             controller.searchController.clear();
             controller.query.value = "";
@@ -62,7 +62,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       style: TextStyle(
         fontSize: 26,
         fontWeight: FontWeight.bold,
-        color: Colors.pink,
+        color: Color.fromARGB(226, 162, 55, 91),
       ),
     );
   }
@@ -74,11 +74,11 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         return Row(
           children: [
             IconButton(
-              icon: Icon(searching ? Icons.close : Icons.search, color: Colors.pink),
+              icon: Icon(searching ? Icons.close : Icons.search, color:Color.fromARGB(226, 162, 55, 91)),
               onPressed: controller.toggleSearch,
             ),
             IconButton(
-              icon: const Icon(Icons.more_vert, color: Colors.pink),
+              icon: const Icon(Icons.more_vert, color:Color.fromARGB(226, 162, 55, 91)),
               onPressed: () {},
             ),
           ],
@@ -90,9 +90,9 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   PreferredSizeWidget _buildTabBar() {
     return TabBar(
       controller: controller.tabController,
-      indicatorColor: Colors.pink,
-      labelColor: Colors.pink,
-      unselectedLabelColor: Colors.pink.withOpacity(0.6),
+      indicatorColor:const Color.fromARGB(226, 162, 55, 91),
+      labelColor: const Color.fromARGB(226, 162, 55, 91),
+      unselectedLabelColor: const Color.fromARGB(255, 175, 50, 92).withOpacity(0.6),
       labelStyle: const TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 16,

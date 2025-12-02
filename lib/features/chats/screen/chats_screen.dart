@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chatter_hub/features/chats/controller/chat_controller.dart';
-
 import 'package:flutter_chatter_hub/features/chats/widgets/chat_app_bar.dart';
 import 'package:flutter_chatter_hub/features/chats/widgets/chat_list.dart';
-import 'package:flutter_chatter_hub/features/chats/widgets/custom_bottom_nav.dart';
 
 class ChatsScreen extends StatefulWidget {
   const ChatsScreen({super.key});
@@ -14,9 +12,9 @@ class ChatsScreen extends StatefulWidget {
 
 class _ChatsScreenState extends State<ChatsScreen>
     with SingleTickerProviderStateMixin {
+  
   late final TabController _tabController;
   late final ChatController _chatController;
-  final ValueNotifier<int> _currentIndex = ValueNotifier(0);
 
   @override
   void initState() {
@@ -36,6 +34,7 @@ class _ChatsScreenState extends State<ChatsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ChatAppBar(controller: _chatController),
+
       body: TabBarView(
         controller: _tabController,
         children: [
@@ -43,18 +42,11 @@ class _ChatsScreenState extends State<ChatsScreen>
           ChatList(controller: _chatController),
         ],
       ),
-      bottomNavigationBar: ValueListenableBuilder<int>(
-        valueListenable: _currentIndex,
-        builder: (context, index, _) {
-          return CustomBottomNav(
-            currentIndex: index,
-            onTap: (newIndex) => _currentIndex.value = newIndex,
-          );
-        },
-      ),
+
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () {},
-        backgroundColor: Colors.pink,
+        backgroundColor:  const Color.fromARGB(255, 187, 52, 97),
         child: const Icon(Icons.chat, color: Colors.white),
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chatter_hub/features/chats/screen/chats_screen.dart';
-import 'package:flutter_chatter_hub/features/status/screen/status_screen.dart';
+ import 'package:flutter_chatter_hub/features/status/screen/status_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,10 +12,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  // Only 2 screens for now
+ 
   final screens = [
-    ChatsScreen(),
-    StatusScreen(),
+    const ChatsScreen(),
+    const StatusScreen(),
   ];
 
   @override
@@ -34,10 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
 
-        backgroundColor:  const Color(0xFFF48BB8),        // Bottom bar background
-        selectedItemColor: const Color.fromARGB(255, 146, 33, 70),       // Selected icon + text color
-        unselectedItemColor: const Color.fromARGB(255, 96, 96, 96),     // Unselected icon + text color
-        type: BottomNavigationBarType.fixed,  // Required for custom colors
+        backgroundColor:  const Color(0xFFF48BB8),       
+        selectedItemColor: const Color.fromARGB(255, 146, 33, 70),       
+        unselectedItemColor: const Color.fromARGB(255, 96, 96, 96),     
+        type: BottomNavigationBarType.fixed,  
 
         items: const [
           BottomNavigationBarItem(

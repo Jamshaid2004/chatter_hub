@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chatter_hub/features/chats/model/chat_model.dart';
 
-
 class ChatTile extends StatelessWidget {
   final ChatModel chat;
   final VoidCallback onTap;
@@ -30,7 +29,10 @@ class ChatTile extends StatelessWidget {
       ),
       trailing: Text(
         chat.time,
-        style: const TextStyle(color: Color.fromARGB(255, 122, 122, 122), fontSize: 12),
+        style: const TextStyle(
+          color: Color.fromARGB(255, 122, 122, 122),
+          fontSize: 12,
+        ),
       ),
       onTap: onTap,
     );

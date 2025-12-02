@@ -42,7 +42,7 @@ class _StatusScreenState extends State<StatusScreen> {
             const IconThemeData(color:  Color.fromARGB(255, 187, 52, 97)),
       ),
 
-      // NO BOTTOM NAV HERE — handled only by HomeScreen
+      
 
       body: ListView(
         children: [

@@ -1,8 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_chatter_hub/dialogs/confirm_number_dialog.dart';
 import 'package:flutter_chatter_hub/screens/otp_screen_view.dart';
-
 
 class NumberInputScreenView extends StatefulWidget {
   const NumberInputScreenView({super.key});
@@ -14,15 +12,24 @@ class NumberInputScreenView extends StatefulWidget {
 class _NumberInputScreenViewState extends State<NumberInputScreenView> {
   final formKey = GlobalKey<FormState>();
   final controller = TextEditingController();
-  String countryCode = '+1'; // Default to US country code
 
-  String _formatPhoneNumber(String phoneNumber) {
-    // Remove any non-digit characters
-    String digitsOnly = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
-    // Format to E.164: +[country code][number]
-    return '$countryCode$digitsOnly';
-  }
   
+  String formatPakNumber(String input) {
+    String digits = input.replaceAll(RegExp(r'[^0-9]'), '');
+
+    
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+
+    
+    if (digits.length == 10 && digits.startsWith('3')) {
+      return '+92$digits';
+    }
+
+    return ''; 
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +43,7 @@ class _NumberInputScreenViewState extends State<NumberInputScreenView> {
         ),
         centerTitle: true,
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -49,65 +57,62 @@ class _NumberInputScreenViewState extends State<NumberInputScreenView> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
+
               const SizedBox(height: 40),
 
-              // Country code selector
+              
               Row(
                 children: [
                   SizedBox(
                     width: 100,
                     child: TextFormField(
-                      initialValue: countryCode,
-                      keyboardType: TextInputType.phone,
-                      cursorColor: Colors.pink,
-                      onChanged: (value) {
-                        setState(() {
-                          countryCode = value.startsWith('+') ? value : '+$value';
-                        });
-                      },
+                      initialValue: "+92",
+                      readOnly: true,
                       decoration: const InputDecoration(
-                        hintText: "+1",
-                        prefixText: "",
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.pink, width: 2),
+                          borderSide: BorderSide(color: Color(0xFFF48BB8), width: 2),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.pink, width: 2),
+                          borderSide: BorderSide(color: Color(0xFFF48BB8), width: 2),
                         ),
                       ),
                     ),
                   ),
+
                   const SizedBox(width: 16),
+
+                  
                   Expanded(
                     child: TextFormField(
                       controller: controller,
                       keyboardType: TextInputType.phone,
-                      cursorColor: Colors.pink,
+                      cursorColor: const Color(0xFFF48BB8),
                       maxLength: 15,
+                      decoration: const InputDecoration(
+                        hintText: "3001234567",
+                        prefixIcon: Icon(Icons.phone, color: Color(0xFFF48BB8)),
+                        counterText: "",
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color:  Color(0xFFF48BB8), width: 2),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color:  Color(0xFFF48BB8), width: 2),
+                        ),
+                      ),
+
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Please enter your phone number";
                         }
-                        // Validate that it contains only digits
-                        if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-                          return "Enter a valid phone number";
+
+                        String formatted = formatPakNumber(value);
+
+                        if (formatted.isEmpty) {
+                          return "Enter a valid Pakistani mobile number";
                         }
-                        if (value.length < 7) {
-                          return "Phone number too short";
-                        }
+
                         return null;
                       },
-                      decoration: const InputDecoration(
-                        hintText: "Phone number",
-                        prefixIcon: Icon(Icons.phone, color: Colors.pink),
-                        counterText: "",
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.pink, width: 2),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.pink, width: 2),
-                        ),
-                      ),
                     ),
                   ),
                 ],
@@ -115,25 +120,28 @@ class _NumberInputScreenViewState extends State<NumberInputScreenView> {
 
               const SizedBox(height: 40),
 
-              
+             
               SizedBox(
                 width: 140,
                 height: 40,
                 child: ElevatedButton(
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
-                      final formattedNumber = _formatPhoneNumber(controller.text);
+                      final formattedNumber = formatPakNumber(controller.text);
+
                       showDialog(
                         context: context,
                         builder: (_) => ConfirmNumberDialogView(
                           enteredNumber: formattedNumber,
                           onEdit: () => Navigator.pop(context),
                           onOk: () {
-                            Navigator.pop(context); 
+                            Navigator.pop(context);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => OtpScreenView(phoneNumber: formattedNumber), 
+                                builder: (_) => OtpScreenView(
+                                  phoneNumber: formattedNumber,
+                                ),
                               ),
                             );
                           },
@@ -142,7 +150,7 @@ class _NumberInputScreenViewState extends State<NumberInputScreenView> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 224, 21, 170),
+                    backgroundColor: const Color(0xFFF48BB8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
@@ -152,7 +160,7 @@ class _NumberInputScreenViewState extends State<NumberInputScreenView> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                 ),

@@ -10,12 +10,25 @@ class ReceivedMessageBubble extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-        margin: const EdgeInsets.symmetric(vertical: 5),
+        margin: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 242, 101, 148),
+          color: const Color(0xFFE76B9A),
           borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 3,
+              offset: Offset(1, 2),
+            )
+          ],
         ),
-        child: Text(text, style: const TextStyle(color: Color.fromARGB(255, 6, 2, 2))),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+          ),
+        ),
       ),
     );
   }

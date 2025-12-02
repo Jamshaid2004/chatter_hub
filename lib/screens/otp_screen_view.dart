@@ -89,7 +89,7 @@ class _OtpScreenViewState extends State<OtpScreenView> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Verify your number"),
-          backgroundColor:  const Color.fromARGB(255, 244, 181, 225),
+          backgroundColor: const Color(0xFFF48BB8),
         ),
         body: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -136,10 +136,10 @@ class _OtpScreenViewState extends State<OtpScreenView> {
                       counterText: "",
                       hintText: "Enter 6-digit code",
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.pink),
+                        borderSide: BorderSide(color:  Color(0xFFF48BB8)),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.pink, width: 2),
+                        borderSide: BorderSide(color: Color(0xFFF48BB8), width: 2),
                       ),
                     ),
                   ),
@@ -158,7 +158,7 @@ class _OtpScreenViewState extends State<OtpScreenView> {
                         }
                       } : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 224, 21, 170),
+                        backgroundColor: const Color(0xFFF48BB8),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -180,7 +180,7 @@ class _OtpScreenViewState extends State<OtpScreenView> {
                       );
                     },
                     child: const Text("Didn't receive code? Resend",
-                        style: TextStyle(color: Colors.pink, fontSize: 16)),
+                        style: TextStyle(color: Color(0xFFF48BB8), fontSize: 16)),
                   ),
                 ],
               );

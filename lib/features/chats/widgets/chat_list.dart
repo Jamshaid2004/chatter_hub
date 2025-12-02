@@ -17,12 +17,12 @@ class ChatList extends StatelessWidget {
   Widget build(BuildContext context) {
 
     
-    // 👇 FIX 1: Listen to the chat data (controller.chats) for general updates
+    
     return ValueListenableBuilder(
       valueListenable: controller.chats,
       builder: (context, _, __) {
         
-        // 👇 FIX 2: Nest the listener for the search query (controller.query)
+      
         return ValueListenableBuilder<String>(
           valueListenable: controller.query,
           builder: (context, _, __) {
@@ -30,7 +30,7 @@ class ChatList extends StatelessWidget {
             final filteredChats = controller.filteredChats;
 
             if (filteredChats.isEmpty) {
-              // ... No chats found text ...
+              
               return Center(
                 child: Text(
                   controller.tabController.index == 0
@@ -44,7 +44,7 @@ class ChatList extends StatelessWidget {
             return ListView.separated(
               itemCount: filteredChats.length,
               itemBuilder: (context, index) {
-                final chat = filteredChats[index]; // Use a final variable
+                final chat = filteredChats[index]; 
                 return ChatTile(
                   chat: chat,
                   onTap: () {
