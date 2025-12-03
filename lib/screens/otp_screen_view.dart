@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_chatter_hub/auth/bloc/otp_bloc.dart';
@@ -84,6 +86,9 @@ class _OtpScreenViewState extends State<OtpScreenView> {
 
   @override
   Widget build(BuildContext context) {
+    log('Verification ID: $_verificationId');
+    log('Resend Token: $_resendToken');
+    log('Phone Number: ${widget.phoneNumber}');
     return BlocProvider(
       create: (_) => OtpBloc()..add(SendOtpEvent(widget.phoneNumber)),
       child: Scaffold(
@@ -109,21 +114,55 @@ class _OtpScreenViewState extends State<OtpScreenView> {
                   }
                 });
               } else if (state is OtpErrorState) {
+                // Clear verification ID for session-related errors
+                if (state.message.contains('expired') || 
+                    state.message.contains('invalid-verification')) {
+                  _verificationId = null;
+                  _resendToken = null;
+                }
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message)),
+                  SnackBar(
+                    content: Text(state.message),
+                    duration: const Duration(seconds: 4),
+                  ),
                 );
               }
             },
             builder: (context, state) {
-              if (state is OtpLoadingState) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
+              log('State: $state');
+              final isLoading = state is OtpLoadingState && _verificationId == null;
+              final hasError = state is OtpErrorState;
+              
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-                  Text("We sent an SMS to ${widget.phoneNumber}"),
+                  if (isLoading)
+                    Column(
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 20),
+                        Text("Sending OTP to ${widget.phoneNumber}..."),
+                      ],
+                    )
+                  else if (hasError)
+                    Column(
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                        const SizedBox(height: 10),
+                        Text(
+                          "Failed to send OTP",
+                          style: TextStyle(color: Colors.red[700], fontSize: 16),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          "Please try resending",
+                          style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                        ),
+                      ],
+                    )
+                  else
+                    Text("We sent an SMS to ${widget.phoneNumber}"),
                   const SizedBox(height: 40),
 
                   TextField(
@@ -131,6 +170,7 @@ class _OtpScreenViewState extends State<OtpScreenView> {
                     maxLength: 6,
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
+                    enabled: !isLoading && _verificationId != null,
                     style: const TextStyle(fontSize: 24, letterSpacing: 8),
                     decoration: const InputDecoration(
                       counterText: "",
@@ -141,6 +181,9 @@ class _OtpScreenViewState extends State<OtpScreenView> {
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Color(0xFFF48BB8), width: 2),
                       ),
+                      disabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
                     ),
                   ),
 
@@ -150,40 +193,65 @@ class _OtpScreenViewState extends State<OtpScreenView> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _verificationId != null ? () {
+                      onPressed: (isLoading || _verificationId == null) ? null : () {
+                        final otpCode = _otpController.text.trim();
+                        if (otpCode.length != 6) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please enter a valid 6-digit code"),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          return;
+                        }
                         if (_verificationId != null) {
                           context
                               .read<OtpBloc>()
-                              .add(VerifyOtpEvent(_otpController.text, _verificationId!));
+                              .add(VerifyOtpEvent(otpCode, _verificationId!));
                         }
-                      } : null,
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFF48BB8),
+                        disabledBackgroundColor: Colors.grey,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
                       ),
-                      child: const Text("VERIFY",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
+                      child: state is OtpLoadingState && _verificationId != null
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text("VERIFY",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
                     ),
                   ),
 
                   const SizedBox(height: 20),
 
                   TextButton(
-                    onPressed: () {
+                    onPressed: isLoading ? null : () {
                       context.read<OtpBloc>().add(
                         ResendOtpEvent(widget.phoneNumber, resendToken: _resendToken),
                       );
                     },
-                    child: const Text("Didn't receive code? Resend",
-                        style: TextStyle(color: Color(0xFFF48BB8), fontSize: 16)),
+                    child: Text(
+                      "Didn't receive code? Resend",
+                      style: TextStyle(
+                        color: isLoading ? Colors.grey : const Color(0xFFF48BB8),
+                        fontSize: 16
+                      ),
+                    ),
                   ),
                 ],
-              );
+              );  
             },
           ),
         ),

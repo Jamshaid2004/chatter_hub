@@ -10,6 +10,12 @@ class OtpBloc extends Bloc<OtpEvents, OtpStates>{
     on<SendOtpEvent>((event, emit) async {
       emit(OtpLoadingState());
       try {
+        // Validate phone number format before sending
+        if (event.phoneNumber.isEmpty || !event.phoneNumber.startsWith('+')) {
+          emit(OtpErrorState('Invalid phone number format. Please include country code (e.g., +92...)'));
+          return;
+        }
+        
         await _auth.verifyPhoneNumber(
           phoneNumber: event.phoneNumber,
           verificationCompleted: (PhoneAuthCredential credential) async {
@@ -47,6 +53,17 @@ class OtpBloc extends Bloc<OtpEvents, OtpStates>{
     on<VerifyOtpEvent>((event, emit) async {
       emit(OtpLoadingState());
       try {
+        // Validate OTP code format
+        if (event.otpCode.isEmpty || event.otpCode.length != 6) {
+          emit(OtpErrorState('Please enter a valid 6-digit code'));
+          return;
+        }
+        
+        if (event.verificationId.isEmpty) {
+          emit(OtpErrorState('Verification session expired. Please request a new code'));
+          return;
+        }
+        
         final credential = PhoneAuthProvider.credential(
           verificationId: event.verificationId,
           smsCode: event.otpCode,
