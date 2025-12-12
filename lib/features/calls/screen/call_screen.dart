@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chatter_hub/features/calls/model/call_model.dart';
 import 'package:flutter_chatter_hub/features/calls/widgets/call_tile.dart';
 
-
-
 class CallsScreen extends StatelessWidget {
   CallsScreen({super.key});
 
@@ -61,9 +59,7 @@ class CallsScreen extends StatelessWidget {
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text("Recent",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.white)),
+            child: Text("Recent", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
           ),
           ...calls.map((c) => CallTile(call: c)),
         ],

@@ -25,13 +25,11 @@ class UserStatusTile extends StatelessWidget {
           ),
           subtitle: Text(status.time),
         ),
-
-        
         const Padding(
           padding: EdgeInsets.only(left: 80, right: 20),
           child: Divider(
             thickness: 0.5,
-            color:Color.fromARGB(255, 187, 52, 97),
+            color: Color.fromARGB(255, 187, 52, 97),
           ),
         )
       ],

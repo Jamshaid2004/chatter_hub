@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chatter_hub/features/calls/model/call_model.dart';
 
-
 class CallTile extends StatelessWidget {
   final CallModel call;
 
@@ -10,18 +9,12 @@ class CallTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = call.isMissed ? Colors.red : Colors.green;
-    final arrowIcon = call.isIncoming
-        ? Icons.call_received
-        : Icons.call_made;
+    final arrowIcon = call.isIncoming ? Icons.call_received : Icons.call_made;
 
     return ListTile(
       leading: CircleAvatar(
-        backgroundImage: call.profilePic.isNotEmpty
-            ? NetworkImage(call.profilePic)
-            : null,
-        child: call.profilePic.isEmpty
-            ? Text(call.name[0])
-            : null,
+        backgroundImage: call.profilePic.isNotEmpty ? NetworkImage(call.profilePic) : null,
+        child: call.profilePic.isEmpty ? Text(call.name[0]) : null,
       ),
       title: Text(
         "${call.name}${call.count > 1 ? " (${call.count})" : ""}",

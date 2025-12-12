@@ -1,36 +1,36 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_chatter_hub/screens/agree_continue_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_chatter_hub/app.dart';
+import 'package:flutter_chatter_hub/core/injector/injector.dart';
+import 'package:flutter_chatter_hub/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Firebase asynchronously to avoid blocking UI startup
-  unawaited(
-    Firebase.initializeApp().then(
-      (_) {},
-      onError: (e) {
-        debugPrint('Firebase initialization error: $e');
+
+  // Initialize Firebase before using any Firebase services
+  try {
+    debugPrint('Initializing Firebase...');
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.android,
+    ).then(
+      (app) {
+        print('✅ Firebase initialized: ${app.name}');
+        print('Project ID: ${app.options.projectId}');
       },
-    ),
-  );
-  
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false, 
-      title: 'Chatter Hub',
-      theme: ThemeData(
-        primarySwatch: Colors.pink,
-      ),
-      home: const AgreeContinueView(), 
+      onError: (e) {
+        debugPrint('❌ Firebase initialization error: $e');
+      },
     );
+
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.playIntegrity,
+    );
+
+    await initializeDependencies();
+  } catch (e) {
+    debugPrint('❌ Firebase initialization error: $e');
   }
+
+  runApp(const ChatterHub());
 }
