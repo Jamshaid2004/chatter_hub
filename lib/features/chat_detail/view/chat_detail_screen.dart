@@ -82,9 +82,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     child: Row(
                       children: [
                         const Spacer(),
-                        Expanded(child: Container(child: _invitationButton(icon: Icons.call, label: 'Audio call', isVideoCall: false))),
                         Expanded(
-                            child: Container(child: _invitationButton(icon: Icons.video_call, label: 'Audio call', isVideoCall: true))),
+                          child: _invitationButton(icon: Icons.call, label: 'Audio call', isVideoCall: false),
+                        ),
+                        Expanded(
+                          child: _invitationButton(icon: Icons.video_call, label: 'Video call', isVideoCall: true),
+                        ),
                       ],
                     ),
                   )
@@ -211,22 +214,25 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     required String label,
     required bool isVideoCall,
   }) {
-    final targetUserID = widget.uid; // fall back to name if no ID provided
+    final targetUserID = widget.uid;
 
-    return ZegoSendCallInvitationButton(
-      isVideoCall: isVideoCall,
-      resourceID: "zego_uikit_call",
-      invitees: [
-        ZegoUIKitUser(
-          id: targetUserID,
-          name: widget.username,
-        ),
-      ],
-      icon: ButtonIcon(
-        icon: Icon(
-          icon,
-          color: Colors.white,
-          size: 30,
+    return Material(
+      color: Colors.transparent,
+      child: ZegoSendCallInvitationButton(
+        isVideoCall: isVideoCall,
+        resourceID: "zego_uikit_call",
+        invitees: [
+          ZegoUIKitUser(
+            id: targetUserID,
+            name: widget.username,
+          ),
+        ],
+        icon: ButtonIcon(
+          icon: Icon(
+            icon,
+            color: Colors.white,
+            size: 24,
+          ),
         ),
       ),
     );

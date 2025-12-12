@@ -48,19 +48,33 @@ class HomeViewModel extends ChangeNotifier {
       await _requestPermissions();
       ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);
 
+      // Create signaling plugin instance
+      final signalingPlugin = ZegoUIKitSignalingPlugin();
+      
       await ZegoUIKitPrebuiltCallInvitationService().init(
         appID: 657066025,
         appSign: "36bcd473ea7cde6b22fd232e79031714380edde4c0aca2ebad14ca574e0526d5",
         userID: appUser!.uid,
         userName: appUser!.userName,
-        plugins: [ZegoUIKitSignalingPlugin()],
-        // ADD THIS:
+        plugins: [signalingPlugin],
+        // Configure call based on type (audio or video)
         requireConfig: (ZegoCallInvitationData data) {
-          return ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall();
+          // Check if it's a video call or voice call
+          if (data.type == ZegoCallType.videoCall) {
+            return ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall();
+          } else {
+            return ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall();
+          }
         },
       );
 
+      // Wait for signaling plugin to connect (it connects automatically after init)
+      // Give it some time to establish the connection - signaling connects asynchronously
+      await Future.delayed(const Duration(milliseconds: 2000));
+      
       debugPrint("✅ Zego initialized successfully");
+      debugPrint("🔵 Signaling plugin connecting... (this happens asynchronously)");
+      debugPrint("🔵 User ID: ${appUser!.uid}, User Name: ${appUser!.userName}");
     } catch (e) {
       debugPrint("Zego Init Error: $e");
     }
