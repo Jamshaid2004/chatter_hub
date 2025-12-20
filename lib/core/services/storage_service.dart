@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 class FirebaseStorageService {
@@ -22,6 +23,70 @@ class FirebaseStorageService {
     } catch (e) {
       print(" Upload Error: $e");
       return null;
+    }
+  }
+
+// Add these methods to your FirebaseStorageService class
+
+  /// Upload group icon
+  Future<String> uploadGroupIcon(File file, String groupId) async {
+    try {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = 'group_icon_${groupId}_$timestamp.jpg';
+      final ref = _storage.ref().child('groups/$groupId/icon/$fileName');
+
+      final uploadTask = ref.putFile(file);
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      debugPrint('✅ Group icon uploaded: $downloadUrl');
+      return downloadUrl;
+    } catch (e) {
+      debugPrint('❌ Error uploading group icon: $e');
+      rethrow;
+    }
+  }
+
+  /// Upload group media (images/videos)
+  Future<String> uploadGroupMedia({
+    required File file,
+    required String groupId,
+  }) async {
+    try {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final extension = file.path.split('.').last;
+      final fileName = 'media_${timestamp}.$extension';
+      final ref = _storage.ref().child('groups/$groupId/media/$fileName');
+
+      final uploadTask = ref.putFile(file);
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      debugPrint('✅ Group media uploaded: $downloadUrl');
+      return downloadUrl;
+    } catch (e) {
+      debugPrint('❌ Error uploading group media: $e');
+      rethrow;
+    }
+  }
+// Add this method to your FirebaseStorageService class
+
+  /// Upload status image
+  Future<String> uploadStatusImage(File file, String userId) async {
+    try {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = 'status_${userId}_$timestamp.jpg';
+      final ref = _storage.ref().child('statuses/$userId/$fileName');
+
+      final uploadTask = ref.putFile(file);
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      debugPrint('✅ Status image uploaded: $downloadUrl');
+      return downloadUrl;
+    } catch (e) {
+      debugPrint('❌ Error uploading status image: $e');
+      rethrow;
     }
   }
 

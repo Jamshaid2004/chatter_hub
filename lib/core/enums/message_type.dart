@@ -1,5 +1,1 @@
-enum MessageType {
-  text,
-  image,
-  video,
-}
+enum MessageType { text, image, video, audio }

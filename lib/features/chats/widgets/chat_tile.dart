@@ -4,22 +4,54 @@ import 'package:flutter_chatter_hub/features/chats/model/chat_model.dart';
 class ChatTile extends StatelessWidget {
   final ChatModel chat;
   final VoidCallback onTap;
+  final bool isGroup;
 
   const ChatTile({
     super.key,
     required this.chat,
     required this.onTap,
+    this.isGroup = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Chat profile pic :${chat.profilePic}');
     return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: chat.profilePic != null ? NetworkImage(chat.profilePic!) : null,
-        backgroundColor: Colors.grey[300],
-        radius: 27,
-        child: chat.profilePic == null ? const Icon(Icons.person, size: 30, color: Colors.white) : null,
+      leading: Stack(
+        children: [
+          CircleAvatar(
+            backgroundImage:
+                chat.profilePic != null ? NetworkImage(chat.profilePic!) : null,
+            backgroundColor: isGroup
+                ? const Color.fromARGB(255, 187, 52, 97)
+                : Colors.grey[300],
+            radius: 27,
+            child: chat.profilePic == null
+                ? Icon(
+                    isGroup ? Icons.group : Icons.person,
+                    size: 30,
+                    color: Colors.white,
+                  )
+                : null,
+          ),
+          // Group indicator badge
+          if (isGroup)
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 187, 52, 97),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.group,
+                  size: 12,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+        ],
       ),
       title: Text(
         chat.name,

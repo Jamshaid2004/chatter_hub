@@ -7,6 +7,7 @@ class MessageModel {
   final String? text;
   final String? imageUrl;
   final String? videoUrl;
+  final String? audioUrl;
   final MessageType type;
   final Timestamp timestamp;
 
@@ -18,6 +19,7 @@ class MessageModel {
     required this.timestamp,
     this.imageUrl,
     this.videoUrl,
+    this.audioUrl,
   });
 
   Map<String, dynamic> toMap() {
@@ -27,6 +29,7 @@ class MessageModel {
       'text': text,
       'imageUrl': imageUrl,
       'videoUrl': videoUrl,
+      'audioUrl': audioUrl,
       'type': type.name,
       'timestamp': timestamp,
     };
@@ -39,6 +42,7 @@ class MessageModel {
       text: map['text'] ?? '',
       imageUrl: map['imageUrl'],
       videoUrl: map['videoUrl'],
+      audioUrl: map['audioUrl'],
       type: MessageType.values.firstWhere(
         (e) => e.name == (map['type'] ?? 'text'),
         orElse: () => MessageType.text,

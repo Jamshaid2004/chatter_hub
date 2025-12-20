@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chatter_hub/app.dart';
 import 'package:flutter_chatter_hub/core/injector/injector.dart';
+import 'package:flutter_chatter_hub/features/status/screen/status_cleanup_service.dart';
 import 'package:flutter_chatter_hub/firebase_options.dart';
 
 void main() async {
@@ -28,6 +29,7 @@ void main() async {
     );
 
     await initializeDependencies();
+    StatusCleanupService.start();
   } catch (e) {
     debugPrint('❌ Firebase initialization error: $e');
   }

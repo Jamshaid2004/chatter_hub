@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chatter_hub/core/enums/message_type.dart';
@@ -11,24 +10,18 @@ import 'package:flutter_chatter_hub/features/chats/model/message_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
-class ChatDetialViewModel extends ChangeNotifier {
+class GroupChatViewModel extends ChangeNotifier {
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   ValueNotifier<bool> isEmpty = ValueNotifier(true);
 
-  void sendTextMessage({
-    required String otherUserId,
-    required String otherUserName,
-    String? otherUserPfp,
-  }) {
+  void sendTextMessage({required String groupId}) {
     try {
       if (messageController.text.trim().isEmpty) return;
 
       final uid = injector<SharedPref>().getValue('uid');
       final currentUsername =
           injector<SharedPref>().getValue('name') ?? 'No name';
-      final currentUserPfp =
-          injector<SharedPref>().getValue('profilePic') ?? '';
 
       final messageId = const Uuid().v4();
 
@@ -40,17 +33,11 @@ class ChatDetialViewModel extends ChangeNotifier {
         type: MessageType.text,
       );
 
-      final chatId = generateChatId(uid, otherUserId);
-
-      injector<FirebaseFirestoreService>().sendMessage(
-        currentUserId: uid,
-        otherUserId: otherUserId,
-        currentUserName: currentUsername,
-        otherUserName: otherUserName,
-        otherUserPfp: otherUserPfp,
-        chatId: chatId,
+      injector<FirebaseFirestoreService>().sendGroupMessage(
+        groupId: groupId,
+        senderUserId: uid,
+        senderUserName: currentUsername,
         message: message,
-        currentUserPfp: currentUserPfp,
       );
 
       messageController.clear();
@@ -59,23 +46,25 @@ class ChatDetialViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> sendMediaMessage(File file, MessageType type,
-      {required String otherUserId,
-      required String otherUserName,
-      String? otherUserPfp}) async {
+  Future<void> sendMediaMessage(
+    File file,
+    MessageType type, {
+    required String groupId,
+  }) async {
     try {
       final uid = injector<SharedPref>().getValue('uid');
-      final chatId = generateChatId(uid, otherUserId);
+      final currentUsername =
+          injector<SharedPref>().getValue('name') ?? 'Unknown';
 
-      /// Upload media
-      final mediaUrl = await injector<FirebaseStorageService>().uploadChatMedia(
+      // Upload media
+      final mediaUrl =
+          await injector<FirebaseStorageService>().uploadGroupMedia(
         file: file,
-        chatId: chatId,
+        groupId: groupId,
       );
 
       late final MessageModel msg;
       if (type == MessageType.image) {
-        /// Create Image message
         msg = MessageModel(
           messageId: const Uuid().v4(),
           senderUserId: uid,
@@ -84,7 +73,6 @@ class ChatDetialViewModel extends ChangeNotifier {
           timestamp: Timestamp.now(),
         );
       } else {
-        /// Create Video message
         msg = MessageModel(
           messageId: const Uuid().v4(),
           senderUserId: uid,
@@ -94,34 +82,26 @@ class ChatDetialViewModel extends ChangeNotifier {
         );
       }
 
-      /// Save to firestore
-      injector<FirebaseFirestoreService>().sendMessage(
-        currentUserId: uid,
-        otherUserId: otherUserId,
-        currentUserName: injector<SharedPref>().getValue('name'),
-        otherUserName: otherUserName,
-        otherUserPfp: otherUserPfp,
-        chatId: chatId,
+      // Save to firestore
+      injector<FirebaseFirestoreService>().sendGroupMessage(
+        groupId: groupId,
+        senderUserId: uid,
+        senderUserName: currentUsername,
         message: msg,
-        currentUserPfp: injector<SharedPref>().getValue('profilePic'),
       );
     } catch (e) {
       debugPrint("Media send failed: $e");
     }
   }
 
-  void pickMedia(
-      String otherUserId, String otherUserName, String? otherUserPfp) async {
+  void pickMedia(String groupId) async {
     try {
       final picker = ImagePicker();
-
       final XFile? pickedFile = await picker.pickMedia();
+
       if (pickedFile == null) return;
 
       final path = pickedFile.path.toLowerCase();
-
-      // Debug
-      debugPrint("Picked file path: $path");
 
       if (path.endsWith(".jpg") ||
           path.endsWith(".jpeg") ||
@@ -133,9 +113,7 @@ class ChatDetialViewModel extends ChangeNotifier {
         sendMediaMessage(
           File(pickedFile.path),
           MessageType.image,
-          otherUserId: otherUserId,
-          otherUserName: otherUserName,
-          otherUserPfp: otherUserPfp,
+          groupId: groupId,
         );
       } else if (path.endsWith(".mp4") ||
           path.endsWith(".mov") ||
@@ -145,9 +123,7 @@ class ChatDetialViewModel extends ChangeNotifier {
         sendMediaMessage(
           File(pickedFile.path),
           MessageType.video,
-          otherUserId: otherUserId,
-          otherUserName: otherUserName,
-          otherUserPfp: otherUserPfp,
+          groupId: groupId,
         );
       }
     } catch (e) {
@@ -155,14 +131,14 @@ class ChatDetialViewModel extends ChangeNotifier {
     }
   }
 
-  String generateChatId(String uid1, String uid2) {
-    final ids = [uid1, uid2]..sort();
-    return ids.join('_');
+  Stream<List<MessageModel>> listenToGroupMessages(String groupId) {
+    return injector<FirebaseFirestoreService>().listenToGroupMessages(groupId);
   }
 
-  Stream<List<MessageModel>> listenToMessages(String otherUserId) {
-    final userId = injector<SharedPref>().getValue('uid');
-    return injector<FirebaseFirestoreService>().listenToMessages(userId,
-        generateChatId(injector<SharedPref>().getValue('uid'), otherUserId));
+  @override
+  void dispose() {
+    messageController.dispose();
+    scrollController.dispose();
+    super.dispose();
   }
 }
