@@ -7,6 +7,7 @@ import 'package:flutter_chatter_hub/core/services/db/db_local_service.dart';
 import 'package:flutter_chatter_hub/core/services/db/db_remote_service.dart';
 import 'package:flutter_chatter_hub/core/services/storage_service.dart';
 import 'package:flutter_chatter_hub/features/chats/model/message_model.dart';
+import 'package:flutter_chatter_hub/features/group/group_message_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
@@ -25,10 +26,11 @@ class GroupChatViewModel extends ChangeNotifier {
 
       final messageId = const Uuid().v4();
 
-      final message = MessageModel(
+      final message = GroupMessageModel(
         text: messageController.text.trim(),
         messageId: messageId,
         senderUserId: uid,
+        senderUserName: currentUsername,
         timestamp: Timestamp.now(),
         type: MessageType.text,
       );
@@ -63,19 +65,21 @@ class GroupChatViewModel extends ChangeNotifier {
         groupId: groupId,
       );
 
-      late final MessageModel msg;
+      late final GroupMessageModel msg;
       if (type == MessageType.image) {
-        msg = MessageModel(
+        msg = GroupMessageModel(
           messageId: const Uuid().v4(),
           senderUserId: uid,
+          senderUserName: currentUsername,
           imageUrl: mediaUrl,
           type: type,
           timestamp: Timestamp.now(),
         );
       } else {
-        msg = MessageModel(
+        msg = GroupMessageModel(
           messageId: const Uuid().v4(),
           senderUserId: uid,
+          senderUserName: currentUsername,
           videoUrl: mediaUrl,
           type: type,
           timestamp: Timestamp.now(),
@@ -131,14 +135,9 @@ class GroupChatViewModel extends ChangeNotifier {
     }
   }
 
-  Stream<List<MessageModel>> listenToGroupMessages(String groupId) {
-    return injector<FirebaseFirestoreService>().listenToGroupMessages(groupId);
-  }
-
-  @override
-  void dispose() {
-    messageController.dispose();
-    scrollController.dispose();
-    super.dispose();
+  Stream<List<GroupMessageModel>> listenToGroupMessages(String groupId) {
+    return injector<FirebaseFirestoreService>().listenToGroupMessages(groupId).map((messages) {
+      return messages.map((message) => GroupMessageModel.fromMap(message.toMap())).toList();
+    });
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chatter_hub/core/enums/message_type.dart';
 import 'package:flutter_chatter_hub/features/chats/model/chat_model.dart';
 import 'package:flutter_chatter_hub/features/chats/model/message_model.dart';
+import 'package:flutter_chatter_hub/features/group/group_message_model.dart';
 import 'package:flutter_chatter_hub/features/group/model/group_model.dart';
 import 'package:flutter_chatter_hub/features/profile_info/model/profile_model.dart';
 import 'package:flutter_chatter_hub/features/status/model/status_model.dart';
@@ -91,7 +92,7 @@ class FirebaseFirestoreService {
     required String groupId,
     required String senderUserId,
     required String senderUserName,
-    required MessageModel message,
+    required GroupMessageModel message,
   }) async {
     try {
       // Add message to group's messages subcollection
@@ -135,7 +136,7 @@ class FirebaseFirestoreService {
   }
 
   /// Listen to group messages
-  Stream<List<MessageModel>> listenToGroupMessages(String groupId) {
+  Stream<List<GroupMessageModel>> listenToGroupMessages(String groupId) {
     return _firestore
         .collection('groups')
         .doc(groupId)
@@ -144,7 +145,7 @@ class FirebaseFirestoreService {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => MessageModel.fromMap(doc.data()))
+          .map((doc) => GroupMessageModel.fromMap(doc.data()))
           .toList();
     });
   }

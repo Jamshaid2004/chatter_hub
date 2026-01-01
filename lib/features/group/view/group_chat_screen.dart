@@ -5,8 +5,10 @@ import 'package:flutter_chatter_hub/core/enums/message_type.dart';
 import 'package:flutter_chatter_hub/core/injector/injector.dart';
 import 'package:flutter_chatter_hub/core/services/db/db_local_service.dart';
 import 'package:flutter_chatter_hub/core/services/db/db_remote_service.dart';
+import 'package:flutter_chatter_hub/features/chat_detail/view/widgets/group_message_bubble.dart';
 import 'package:flutter_chatter_hub/features/chat_detail/view/widgets/message_bubble.dart';
 import 'package:flutter_chatter_hub/features/chats/model/message_model.dart';
+import 'package:flutter_chatter_hub/features/group/group_message_model.dart';
 import 'package:flutter_chatter_hub/features/group/view_model/group_chat_view_model.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
@@ -221,9 +223,10 @@ class _GroupChatScreenState extends State<GroupChatScreen>
       }
 
       final messageId = const Uuid().v4();
-      final message = MessageModel(
+      final message = GroupMessageModel(
         messageId: messageId,
         senderUserId: currentUserId,
+        senderUserName: currentUserName ?? 'Unknown',
         audioUrl: audioPath,
         type: MessageType.audio,
         timestamp: Timestamp.now(),
@@ -333,7 +336,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
             body: Column(
               children: [
                 Expanded(
-                  child: StreamBuilder<List<MessageModel>>(
+                  child: StreamBuilder<List<GroupMessageModel>>(
                     stream: viewModel.listenToGroupMessages(widget.groupId),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
@@ -368,10 +371,12 @@ class _GroupChatScreenState extends State<GroupChatScreen>
 
                           final msg = messages[index];
                           final userId = injector<SharedPref>().getValue('uid');
+                          
 
-                          return MessageBubble(
+                          return GroupMessageBubble(
                             message: msg,
                             isMe: msg.senderUserId == userId,
+                            
                           );
                         },
                       );

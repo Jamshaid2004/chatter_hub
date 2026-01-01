@@ -192,10 +192,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                                     CircleAvatar(
                                       radius: 25,
                                       backgroundImage:
-                                          user.profilePic!.isNotEmpty
+                                          user.profilePic?.isNotEmpty ?? false
                                               ? NetworkImage(user.profilePic!)
                                               : null,
-                                      child: user.profilePic!.isEmpty
+                                      child: user.profilePic?.isEmpty ?? false
                                           ? const Icon(Icons.person)
                                           : null,
                                     ),
@@ -315,10 +315,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                                 child: ListTile(
                                   leading: CircleAvatar(
                                     radius: 25,
-                                    backgroundImage: user.profilePic!.isNotEmpty
-                                        ? NetworkImage(user.profilePic!)
+                                    backgroundImage: user.profilePic?.isNotEmpty ?? false
+                                        ? NetworkImage(user.profilePic ?? '')
                                         : null,
-                                    child: user.profilePic!.isEmpty
+                                    child: user.profilePic?.isEmpty ?? false
                                         ? const Icon(Icons.person)
                                         : null,
                                   ),
